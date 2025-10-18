@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg-info
+.Python
+.env
+.venv
+env/
+venv/
+ENV/
+.ipynb_checkpoints/
+.pytest_cache/
+models/
+data/processed/
+demo_video/
+docs/report.pdf
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
