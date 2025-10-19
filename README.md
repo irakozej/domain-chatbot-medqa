@@ -1,4 +1,4 @@
-# 🧠 MedQA Domain-Specific Chatbot
+#  MedQA Domain-Specific Chatbot
 
 A **domain-specific medical question-answering chatbot** fine-tuned on the **MedQuAD dataset** using **Google’s T5 Transformer model**.  
 This project aims to provide **accurate, reliable, and context-aware answers** to medical questions through a **friendly chat interface** built with **Gradio**.
@@ -20,7 +20,7 @@ This project aims to provide **accurate, reliable, and context-aware answers** t
 
 ---
 
-## 🚀 Overview
+## Overview
 
 The **MedQA Chatbot** is a **domain-specific AI assistant** trained to answer **medical-related questions** with concise, medically accurate responses.  
 It uses a fine-tuned version of **T5 (Text-to-Text Transfer Transformer)**, which is ideal for natural language understanding and question answering.
@@ -35,7 +35,7 @@ This chatbot can be easily extended or deployed in **hospitals**, **health apps*
 
 ---
 
-## 🧱 Project Structure
+## Project Structure
 
 domain-chatbot-medqa/
 │
@@ -57,7 +57,7 @@ domain-chatbot-medqa/
 
 ---
 
-## 🧬 Dataset
+## Dataset
 
 The chatbot is trained on a **custom cleaned version of the MedQuAD dataset** —  
 a publicly available dataset that contains **47,000+ medical question–answer pairs** across multiple diseases, conditions, and treatments.
@@ -75,7 +75,7 @@ Before training, the data was:
 
 ---
 
-## 🤖 Model
+## Model
 
 **Model Architecture:** T5 (Text-to-Text Transfer Transformer)  
 **Base Model:** `t5-small`  
@@ -90,7 +90,7 @@ Output: "High blood pressure is caused by ..."
 
 ---
 
-## 🧩 Training Process
+## Training Process
 
 Training steps included:
 1. Data preprocessing and cleaning  
