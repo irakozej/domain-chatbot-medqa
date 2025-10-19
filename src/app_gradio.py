@@ -1,100 +1,110 @@
-# src/app_gradio.py
 import gradio as gr
-from transformers import T5Tokenizer, TFT5ForConditionalGeneration
+from transformers import T5TokenizerFast, TFAutoModelForSeq2SeqLM
+import tensorflow as tf
 
-# =========================================================
-# ✅ Load Model and Tokenizer
-# =========================================================
+# ==============================
+# 🧠 Load model and tokenizer
+# ==============================
 MODEL_PATH = "/Users/mac/Schools/ALU/ML Techniques I/domain-chatbot-medqa/models/t5_medqa_finetuned"
+PREFIX = "question: "
+MAX_LEN = 128
 
-print(f"🔍 Loading TensorFlow model from local path: {MODEL_PATH}")
-tokenizer = T5Tokenizer.from_pretrained(MODEL_PATH)
-model = TFT5ForConditionalGeneration.from_pretrained(MODEL_PATH)
+print("🔄 Loading model and tokenizer...")
+tokenizer = T5TokenizerFast.from_pretrained(MODEL_PATH)
+model = TFAutoModelForSeq2SeqLM.from_pretrained(MODEL_PATH)
+print("✅ Model loaded successfully!")
 
-# =========================================================
-# ✅ Chat History Management
-# =========================================================
-chat_history = []  # list of tuples: (user, bot)
+# ==============================
+# 💬 Chatbot function
+# ==============================
+def chatbot_response(user_message, history):
+    if not user_message.strip():
+        return history
 
-def medqa_chat(user_input, history):
-    if not user_input.strip():
-        return history, gr.update(value="")
+    # Format input
+    input_text = PREFIX + user_message
+    inputs = tokenizer.encode(input_text, return_tensors="tf", max_length=MAX_LEN, truncation=True)
 
-    input_text = "question: " + user_input
-    input_ids = tokenizer.encode(input_text, return_tensors="tf")
-
+    # Generate response
     output = model.generate(
-        input_ids,
+        inputs,
         max_length=128,
         num_beams=4,
-        early_stopping=True
+        early_stopping=True,
+        temperature=0.7,
     )
-
     bot_reply = tokenizer.decode(output[0], skip_special_tokens=True)
 
-    history = history + [(user_input, bot_reply)]
-    return history, gr.update(value="")
+    # Append to chat history
+    history.append((user_message, bot_reply))
+    return history
 
-def clear_chat():
-    return [], gr.update(value="")
-
-# =========================================================
-# ✅ Custom Chat UI Styling
-# =========================================================
-css = """
-#chatbot {
-  height: 500px !important;
-  overflow-y: auto !important;
+# ==============================
+# 🎨 Custom CSS for styling
+# ==============================
+custom_css = """
+.chatbot-container {
+    background-color: #f9fafb;
+    border-radius: 15px;
+    padding: 20px;
 }
 
-.user-message {
-  background-color: #DCF8C6;
-  color: black;
-  padding: 8px 12px;
-  border-radius: 16px 16px 0 16px;
-  margin: 6px 0;
-  max-width: 75%;
-  align-self: flex-end;
+.user-bubble {
+    background-color: #2563eb;
+    color: white;
+    border-radius: 20px;
+    padding: 10px 15px;
+    max-width: 75%;
+    align-self: flex-end;
+    margin: 5px;
 }
 
-.bot-message {
-  background-color: #EAEAEA;
-  color: black;
-  padding: 8px 12px;
-  border-radius: 16px 16px 16px 0;
-  margin: 6px 0;
-  max-width: 75%;
-  align-self: flex-start;
+.bot-bubble {
+    background-color: #e5e7eb;
+    color: #111827;
+    border-radius: 20px;
+    padding: 10px 15px;
+    max-width: 75%;
+    align-self: flex-start;
+    margin: 5px;
 }
 
-#chatbox {
-  display: flex;
-  flex-direction: column;
+footer {
+    display: none !important;
 }
 """
 
-# =========================================================
-# ✅ Create Chatbot Interface
-# =========================================================
-with gr.Blocks(css=css, theme=gr.themes.Soft()) as demo:
-    gr.Markdown("## 🩺 MedQA Chatbot — Ask Medical Questions")
-    chatbot = gr.Chatbot(elem_id="chatbot", label="Chat History", height=500)
-    user_input = gr.Textbox(
-        placeholder="Type your medical question here...",
-        show_label=False
+# ==============================
+# ⚙️ Gradio UI
+# ==============================
+with gr.Blocks(css=custom_css, theme=gr.themes.Soft()) as demo:
+    gr.Markdown(
+        """
+        <div style='text-align:center;'>
+            <h1 style='color:#2563eb;'>💬 MedQA Chatbot</h1>
+            <p style='color:gray;'>Your AI assistant for medical questions</p>
+        </div>
+        """,
     )
-    clear_btn = gr.Button("🧹 Clear Chat")
+
+    chatbot = gr.Chatbot(label="MedQA Chatbot", elem_classes=["chatbot-container"])
+    user_input = gr.Textbox(
+        placeholder="Ask me anything medical...",
+        label="Your Question",
+        lines=1
+    )
 
     with gr.Row():
-        submit_btn = gr.Button("💬 Send", variant="primary")
+        clear_btn = gr.Button("🧹 Clear Chat", variant="secondary")
+        send_btn = gr.Button("🚀 Send", variant="primary")
 
-    # Events
-    submit_btn.click(medqa_chat, inputs=[user_input, chatbot], outputs=[chatbot, user_input])
-    user_input.submit(medqa_chat, inputs=[user_input, chatbot], outputs=[chatbot, user_input])
-    clear_btn.click(clear_chat, outputs=[chatbot, user_input])
+    # Function linking
+    send_btn.click(chatbot_response, [user_input, chatbot], [chatbot])
+    user_input.submit(chatbot_response, [user_input, chatbot], [chatbot])
+    clear_btn.click(lambda: None, None, chatbot, queue=False)
 
-# =========================================================
-# ✅ Launch App
-# =========================================================
+# ==============================
+# 🚀 Launch app
+# ==============================
 if __name__ == "__main__":
-    demo.launch(share=True)
+    demo.launch(server_name="0.0.0.0", server_port=7860)
