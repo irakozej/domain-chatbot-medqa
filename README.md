@@ -120,16 +120,15 @@ Once trained, the model was integrated into an interactive Gradio chat app locat
 src/app_gradio.py
 
 
-'''Installation'''
+Installation
 
-'''git clone https://github.com/<your-username>/domain-chatbot-medqa.git
-cd domain-chatbot-medqa'''
+git clone https://github.com/<your-username>/domain-chatbot-medqa.git
+cd domain-chatbot-medqa
 
-'''Create and activate a virtual environment'''
-'''python3 -m venv venv
+Create and activate a virtual environment
+python3 -m venv venv
 source venv/bin/activate    # (Mac/Linux)
-venv\Scripts\activate'''       # (Windows)
+venv\Scripts\activate       # (Windows)
 
-'''Install dependencies'''
-'''pip install -r requirements.txt
-'''
+Install dependencies
+pip install -r requirements.txt
